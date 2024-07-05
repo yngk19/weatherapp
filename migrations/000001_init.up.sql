@@ -1,5 +1,6 @@
 CREATE TABLE cities (
-    name varchar(60) primary key, 
+    id serial primary key,
+    name varchar(60), 
     country varchar(60),
     lat float,
     lon float
@@ -8,7 +9,7 @@ CREATE TABLE cities (
 CREATE TABLE forecasts (
     id serial primary key,
     temp float,
-    city varchar(60) references cities(name) on delete cascade,
+    city int references cities(id) on delete cascade,
     data jsonb not null
 );
 

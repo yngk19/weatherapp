@@ -3,6 +3,7 @@ package config
 import (
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/ilyakaznacheev/cleanenv"
@@ -22,7 +23,7 @@ type ServerConfig struct {
 
 type DBConfig struct {
 	Host           string
-	Port           string
+	Port           uint16
 	User           string
 	Password       string
 	SSLMode        string
@@ -45,7 +46,11 @@ func MustLoad() *Config {
 	configPath := os.Getenv("CONFIG_PATH")
 	OpenWeatherAPIKey := os.Getenv("OPENWEATHER_KEY")
 	dbHost := os.Getenv("POSTGRES_HOST")
-	dbPort := os.Getenv("POSTGRES_PORT")
+	dbPortString := os.Getenv("POSTGRES_PORT")
+	dbPort, err := strconv.Atoi(dbPortString)
+	if err != nil {
+		log.Fatalln(err)
+	}
 	dbName := os.Getenv("POSTGRES_DB")
 	dbUser := os.Getenv("POSTGRES_USER")
 	dbPassword := os.Getenv("POSTGRES_PASSWORD")
@@ -53,7 +58,7 @@ func MustLoad() *Config {
 	dbMigrationsPath := os.Getenv("MIGRATIONS_PATH")
 	var db DBConfig = DBConfig{
 		Host:           dbHost,
-		Port:           dbPort,
+		Port:           uint16(dbPort),
 		User:           dbUser,
 		Password:       dbPassword,
 		SSLMode:        dbSSLMode,
