@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS users;
+
+DROP TABLE IF EXISTS forecasts;
+
+DROP TABLE IF EXISTS cities;

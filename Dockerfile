@@ -1,4 +1,4 @@
-FROM golang:1.21.4-alpine AS build_base
+FROM golang:1.22.4-alpine AS build_base
 
 RUN apk --no-cache add bash git make gcc gettext musl-dev
 

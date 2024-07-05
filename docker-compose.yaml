@@ -21,18 +21,24 @@ services:
       - application
     volumes:
       - pgdata:/var/lib/postgresql/data
-    restart: always
+    restart: on-failure
     environment:
       - POSTGRES_DB
       - POSTGRES_USER
       - POSTGRES_PASSWORD
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   db-migrate:
     container_name: db-migrate
     image: migrate/migrate
     networks:
       - application
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     volumes:
       - ./migrations:/migrations
     command: [
