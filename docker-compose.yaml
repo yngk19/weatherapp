@@ -34,10 +34,10 @@ services:
     depends_on:
       - db
     volumes:
-      - ./schema:/schema
+      - ./migrations:/migrations
     command: [
       "-path",
-      "/schema",
+      "/migrations",
       "-database",
       "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=${SSL_MODE}",
       "up"
