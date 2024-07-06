@@ -29,7 +29,7 @@ type List struct {
 	Pop        float64 `json:"pop"`
 	Rain       `json:"rain,omitempty"`
 	Sys        `json:"sys"`
-	DtTxt      time.Time `json:"dt_txt"`
+	DtTxt      string `json:"dt_txt"`
 }
 
 type Main struct {

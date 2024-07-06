@@ -7,7 +7,9 @@ import (
 	"github.com/yngk19/weatherapp/internal/config"
 	"github.com/yngk19/weatherapp/internal/pkg/db"
 	"github.com/yngk19/weatherapp/internal/pkg/geoapiclient"
+	"github.com/yngk19/weatherapp/internal/pkg/weatherclient"
 	citiesrepo "github.com/yngk19/weatherapp/internal/repository/cities"
+	forecastsrepo "github.com/yngk19/weatherapp/internal/repository/forecasts"
 )
 
 func main() {
@@ -16,8 +18,13 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	citiesrepo := citiesrepo.New(pool)
-	err = geoapiclient.GetCities(citiesrepo, cfg.OpenWeatherAPIKey)
+	citiesRepo := citiesrepo.New(pool)
+	forecastsRepo := forecastsrepo.New(pool)
+	err = geoapiclient.GetCities(citiesRepo, cfg.OpenWeatherAPIKey)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	err = weatherclient.GetForecasts(forecastsRepo, citiesRepo, cfg.OpenWeatherAPIKey)
 	if err != nil {
 		log.Fatalln(err)
 	}

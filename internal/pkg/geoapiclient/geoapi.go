@@ -10,33 +10,34 @@ import (
 	"github.com/yngk19/weatherapp/internal/model/dto"
 )
 
+var cities = []string{
+	"Moscow",
+	"Ufa",
+	"Kazan",
+	"Yekaterinburg",
+	"Novosibirsk",
+	"Tomsk",
+	"Samara",
+	"Petrozavodsk",
+	"Perm",
+	"Vladivostok",
+	"Ussuriysk",
+	"Sochi",
+	"Obninsk",
+	"Arzamas",
+	"Abakan",
+	"Chelyabinsk",
+	"Kaliningrad",
+	"Tyumen",
+	"London",
+	"Krasnoyarsk",
+}
+
 type CitiesRepo interface {
 	Create(context.Context, dto.Town) error
 }
 
 func GetCities(repo CitiesRepo, apiToken string) error {
-	cities := []string{
-		"Moscow",
-		"Ufa",
-		"Kazan",
-		"Yekaterinburg",
-		"Novosibirsk",
-		"Tomsk",
-		"Samara",
-		"Petrozavodsk",
-		"Perm",
-		"Vladivostok",
-		"Ussuriysk",
-		"Sochi",
-		"Obninsk",
-		"Arzamas",
-		"Abakan",
-		"Chelyabinsk",
-		"Kaliningrad",
-		"Tyumen",
-		"London",
-		"Krasnoyarsk",
-	}
 	client := http.Client{Transport: &http.Transport{MaxIdleConnsPerHost: 100}}
 
 	var wg sync.WaitGroup
