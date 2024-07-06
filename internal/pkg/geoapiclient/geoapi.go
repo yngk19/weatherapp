@@ -1,0 +1,69 @@
+package geoapiclient
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"sync"
+
+	"github.com/yngk19/weatherapp/internal/model/dto"
+)
+
+type CitiesRepo interface {
+	Create(context.Context, dto.Town) error
+}
+
+func GetCities(repo CitiesRepo, apiToken string) error {
+	cities := []string{
+		"Moscow",
+		"Ufa",
+		"Kazan",
+		"Yekaterinburg",
+		"Novosibirsk",
+		"Tomsk",
+		"Samara",
+		"Petrozavodsk",
+		"Perm",
+		"Vladivostok",
+		"Ussuriysk",
+		"Sochi",
+		"Obninsk",
+		"Arzamas",
+		"Abakan",
+		"Chelyabinsk",
+		"Kaliningrad",
+		"Tyumen",
+		"London",
+		"Krasnoyarsk",
+	}
+	client := http.Client{Transport: &http.Transport{MaxIdleConnsPerHost: 100}}
+
+	var wg sync.WaitGroup
+	for _, city := range cities {
+		wg.Add(1)
+		url := fmt.Sprintf("http://api.openweathermap.org/geo/1.0/direct?q=%s&limit=1&appid=%s", city, apiToken)
+		go func(url string) {
+			towns := make([]dto.Town, 1)
+			defer wg.Done()
+			resp, err := client.Get(url)
+			if err != nil {
+				fmt.Printf("%s: %s\n", url, err)
+				return
+			}
+			defer resp.Body.Close()
+			if err = json.NewDecoder(resp.Body).Decode(&towns); err != nil {
+				fmt.Printf("%s: %s\n", url, err)
+				return
+			}
+			err = repo.Create(context.TODO(), towns[0])
+			if err != nil {
+				fmt.Printf("Create %s: %s\n", towns[0].Name, err)
+				return
+			}
+		}(url)
+	}
+
+	wg.Wait()
+	return nil
+}

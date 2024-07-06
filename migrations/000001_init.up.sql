@@ -1,6 +1,6 @@
 CREATE TABLE cities (
     id serial primary key,
-    name varchar(60), 
+    name varchar(60) UNIQUE, 
     country varchar(60),
     lat float,
     lon float

@@ -2,11 +2,11 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/yngk19/weatherapp/internal/config"
 	"github.com/yngk19/weatherapp/internal/pkg/db"
+	"github.com/yngk19/weatherapp/internal/pkg/geoapiclient"
 	citiesrepo "github.com/yngk19/weatherapp/internal/repository/cities"
 )
 
@@ -16,6 +16,9 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	fmt.Println("DB connected!")
-	_ = citiesrepo.New(pool)
+	citiesrepo := citiesrepo.New(pool)
+	err = geoapiclient.GetCities(citiesrepo, cfg.OpenWeatherAPIKey)
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
