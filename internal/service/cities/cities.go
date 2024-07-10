@@ -3,7 +3,6 @@ package cities
 import (
 	"context"
 	"strings"
-	"time"
 
 	"github.com/yngk19/weatherapp/internal/model/domain"
 	"github.com/yngk19/weatherapp/internal/model/dto"
@@ -19,7 +18,7 @@ type citiesRepo interface {
 type forecastsRepo interface {
 	Create(ctx context.Context, forecast dto.WeatherForecast, city domain.Town) error
 	GetByCityID(ctx context.Context, id int) ([]domain.WeatherForecast, error)
-	GetByDate(ctx context.Context, date time.Time) (*domain.WeatherForecast, error)
+	GetByDate(ctx context.Context, date string, id int) (*domain.WeatherForecast, error)
 }
 
 type Service struct {
@@ -56,8 +55,8 @@ func (s *Service) GetForecastByCityID(ctx context.Context, id int) ([]domain.Wea
 	return forecasts, nil
 }
 
-func (s *Service) GetForecastByDate(ctx context.Context, date time.Time) (*domain.WeatherForecast, error) {
-	forecast, err := s.forecastsRepo.GetByDate(ctx, date)
+func (s *Service) GetForecastByDate(ctx context.Context, date string, id int) (*domain.WeatherForecast, error) {
+	forecast, err := s.forecastsRepo.GetByDate(ctx, date, id)
 	if err != nil {
 		return nil, err
 	}

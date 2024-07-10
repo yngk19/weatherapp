@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"time"
 
 	_ "github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -73,13 +72,14 @@ func (r *Repo) GetByCityID(ctx context.Context, id int) ([]domain.WeatherForecas
 	return forecasts, nil
 }
 
-func (r *Repo) GetByDate(ctx context.Context, date time.Time) (*domain.WeatherForecast, error) {
+func (r *Repo) GetByDate(ctx context.Context, date string, id int) (*domain.WeatherForecast, error) {
 	var forecast domain.WeatherForecast
 	query := `
 		SELECT f.id, f.temp, f.predict_date, f.detail_info
-		FROM forecasts f WHERE predict_date = $1;
+		FROM forecasts f WHERE f.predict_date = $1
+		AND f.city_id = $2;
 	`
-	if err := r.pool.QueryRow(ctx, query, date).Scan(&forecast.ID, &forecast.Temperature, &forecast.Date, &forecast.DetailInfo); err != nil {
+	if err := r.pool.QueryRow(ctx, query, date, id).Scan(&forecast.ID, &forecast.Temperature, &forecast.Date, &forecast.DetailInfo); err != nil {
 		return nil, fmt.Errorf("repository.Forecasts.GetByDate: %w", err)
 	}
 	return &forecast, nil

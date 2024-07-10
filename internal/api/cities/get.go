@@ -58,3 +58,27 @@ func (api *API) GetShortForecast(c *gin.Context) {
 		"short_forecast": forecast,
 	})
 }
+
+func (api *API) GetForecastByDate(c *gin.Context) {
+	cityID, err := strconv.Atoi(c.Param("cityID"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "error",
+			"msg":    err,
+		})
+		return
+	}
+	date := c.Param("date")
+	forecast, err := api.service.GetForecastByDate(c, date, cityID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "error",
+			"msg":    err,
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"stats": "success",
+		date:    forecast,
+	})
+}

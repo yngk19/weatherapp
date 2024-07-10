@@ -2,7 +2,6 @@ package cities
 
 import (
 	"context"
-	"time"
 
 	"github.com/yngk19/weatherapp/internal/model/domain"
 	"github.com/yngk19/weatherapp/internal/model/dto"
@@ -11,7 +10,7 @@ import (
 type citiesService interface {
 	GetCities(ctx context.Context) ([]domain.Town, error)
 	GetForecastByCityID(ctx context.Context, id int) ([]domain.WeatherForecast, error)
-	GetForecastByDate(ctx context.Context, date time.Time) (*domain.WeatherForecast, error)
+	GetForecastByDate(ctx context.Context, date string, id int) (*domain.WeatherForecast, error)
 	GetShortByCityID(ctx context.Context, id int) (*dto.ShortForecast, error)
 }
 

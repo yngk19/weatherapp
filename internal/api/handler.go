@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/yngk19/weatherapp/internal/api/cities"
@@ -13,7 +12,7 @@ import (
 type citiesService interface {
 	GetCities(ctx context.Context) ([]domain.Town, error)
 	GetForecastByCityID(ctx context.Context, id int) ([]domain.WeatherForecast, error)
-	GetForecastByDate(ctx context.Context, date time.Time) (*domain.WeatherForecast, error)
+	GetForecastByDate(ctx context.Context, date string, id int) (*domain.WeatherForecast, error)
 	GetShortByCityID(ctx context.Context, id int) (*dto.ShortForecast, error)
 }
 
@@ -32,6 +31,7 @@ func New(logger logger, citcitiesService citiesService) (*gin.Engine, error) {
 	api := r.Group("/")
 	api.GET("/cities", citiesAPI.GetCities)
 	api.GET("/cities/:cityID/short", citiesAPI.GetShortForecast)
+	api.GET("cities/:cityID/:date", citiesAPI.GetForecastByDate)
 
 	return r, nil
 }
