@@ -49,7 +49,7 @@ func (r *Repo) GetByCityID(ctx context.Context, id int) ([]domain.WeatherForecas
 	var forecasts []domain.WeatherForecast
 	query := `
 		SELECT f.id, f.temp, f.predict_date, f.detail_info 
-		FROM forecasts f WHERE city_id = $1
+		FROM forecasts f WHERE f.city_id = $1
 		ORDER BY predict_date DESC
 		LIMIT 5;
 	`

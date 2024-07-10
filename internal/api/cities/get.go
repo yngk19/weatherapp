@@ -2,6 +2,7 @@ package cities
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,6 +20,7 @@ func (api *API) GetCities(c *gin.Context) {
 			"error": err,
 		})
 		api.logger.Err(err)
+		return
 	}
 	var cities []City
 	for _, city := range citiesDomain {
@@ -29,6 +31,30 @@ func (api *API) GetCities(c *gin.Context) {
 		})
 	}
 	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
 		"cities": cities,
+	})
+}
+
+func (api *API) GetShortForecast(c *gin.Context) {
+	cityID, err := strconv.Atoi(c.Param("cityID"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "error",
+			"msg":    err,
+		})
+		return
+	}
+	forecast, err := api.service.GetShortByCityID(c, cityID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "error",
+			"msg":    err,
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"stats":          "success",
+		"short_forecast": forecast,
 	})
 }

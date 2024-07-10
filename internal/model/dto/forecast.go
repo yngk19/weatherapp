@@ -1,14 +1,12 @@
 package dto
 
-import "time"
-
 type ShortForecast struct {
 	Country            string
 	Name               string
 	Lat                float64
 	Lon                float64
 	AverageTemperature float64
-	Dates              []time.Time
+	Dates              []string
 }
 
 type WeatherForecast struct {

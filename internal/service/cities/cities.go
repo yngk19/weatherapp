@@ -2,6 +2,7 @@ package cities
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/yngk19/weatherapp/internal/model/domain"
@@ -12,6 +13,7 @@ import (
 type citiesRepo interface {
 	Create(ctx context.Context, city dto.Town) error
 	GetAll(ctx context.Context) ([]domain.Town, error)
+	GetByCityID(ctx context.Context, id int) (*domain.Town, error)
 }
 
 type forecastsRepo interface {
@@ -43,7 +45,7 @@ func (s *Service) GetCities(ctx context.Context) ([]domain.Town, error) {
 	return cities, nil
 }
 
-func (s *Service) GetByCityID(ctx context.Context, id int) ([]domain.WeatherForecast, error) {
+func (s *Service) GetForecastByCityID(ctx context.Context, id int) ([]domain.WeatherForecast, error) {
 	forecasts, err := s.forecastsRepo.GetByCityID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -54,7 +56,7 @@ func (s *Service) GetByCityID(ctx context.Context, id int) ([]domain.WeatherFore
 	return forecasts, nil
 }
 
-func (s *Service) GetByDate(ctx context.Context, date time.Time) (*domain.WeatherForecast, error) {
+func (s *Service) GetForecastByDate(ctx context.Context, date time.Time) (*domain.WeatherForecast, error) {
 	forecast, err := s.forecastsRepo.GetByDate(ctx, date)
 	if err != nil {
 		return nil, err
@@ -63,4 +65,38 @@ func (s *Service) GetByDate(ctx context.Context, date time.Time) (*domain.Weathe
 		return nil, service.ErrNoForecastForThisDate
 	}
 	return forecast, nil
+}
+
+func (s *Service) GetShortByCityID(ctx context.Context, id int) (*dto.ShortForecast, error) {
+	forecasts, err := s.forecastsRepo.GetByCityID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if forecasts == nil {
+		return nil, service.ErrNoForecasts
+	}
+	city, err := s.citiesRepo.GetByCityID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if forecasts == nil {
+		return nil, service.ErrNoForecasts
+	}
+	var averageTemp float32
+	var dates []string
+	for _, forecast := range forecasts {
+		averageTemp += float32(forecast.Temperature)
+		date := strings.Split(forecast.Date.String(), " ")[0]
+		dates = append(dates, date)
+	}
+	averageTemp = averageTemp / float32(len(forecasts))
+	shortForecast := dto.ShortForecast{
+		Country:            city.Country,
+		Name:               city.Name,
+		Lat:                city.Lat,
+		Lon:                city.Lon,
+		AverageTemperature: float64(averageTemp),
+		Dates:              dates,
+	}
+	return &shortForecast, nil
 }
