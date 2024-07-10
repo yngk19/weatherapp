@@ -2,8 +2,10 @@ package citiesrepo
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
+	"github.com/jackc/pgx"
 	_ "github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/yngk19/weatherapp/internal/model/domain"
@@ -42,7 +44,10 @@ func (r *Repo) GetAll(ctx context.Context) ([]domain.Town, error) {
 	`
 	rows, err := r.pool.Query(ctx, query)
 	if err != nil {
-		return nil, fmt.Errorf("repository.Cities.GetAll: %w", err)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("repo.Cities.GetAll: %w", err)
 	}
 	for rows.Next() {
 		town := domain.Town{}

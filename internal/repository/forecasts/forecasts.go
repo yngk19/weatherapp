@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	_ "github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -44,17 +45,17 @@ func (r *Repo) Create(ctx context.Context, forecast dto.WeatherForecast, city do
 
 }
 
-func (r *Repo) GetByCityID(ctx context.Context) ([]domain.WeatherForecast, error) {
+func (r *Repo) GetByCityID(ctx context.Context, id int) ([]domain.WeatherForecast, error) {
 	var forecasts []domain.WeatherForecast
 	query := `
 		SELECT f.id, f.temp, f.predict_date, f.detail_info 
-		FROM forecasts f 
+		FROM forecasts f WHERE city_id = $1
 		ORDER BY predict_date DESC
 		LIMIT 5;
 	`
-	rows, err := r.pool.Query(ctx, query)
+	rows, err := r.pool.Query(ctx, query, id)
 	if err != nil {
-		return nil, fmt.Errorf("repository.Forecasts.GetAll: %w", err)
+		return nil, fmt.Errorf("repository.Forecasts.GetByCityID: %w", err)
 	}
 	for rows.Next() {
 		forecast := domain.WeatherForecast{}
@@ -65,9 +66,21 @@ func (r *Repo) GetByCityID(ctx context.Context) ([]domain.WeatherForecast, error
 			&forecast.DetailInfo,
 		)
 		if err != nil {
-			return nil, fmt.Errorf("repository.Forecasts.GetAll: %w", err)
+			return nil, fmt.Errorf("repository.Forecasts.GetByCityID: %w", err)
 		}
 		forecasts = append(forecasts, forecast)
 	}
 	return forecasts, nil
+}
+
+func (r *Repo) GetByDate(ctx context.Context, date time.Time) (*domain.WeatherForecast, error) {
+	var forecast domain.WeatherForecast
+	query := `
+		SELECT f.id, f.temp, f.predict_date, f.detail_info
+		FROM forecasts f WHERE predict_date = $1;
+	`
+	if err := r.pool.QueryRow(ctx, query, date).Scan(&forecast.ID, &forecast.Temperature, &forecast.Date, &forecast.DetailInfo); err != nil {
+		return nil, fmt.Errorf("repository.Forecasts.GetByDate: %w", err)
+	}
+	return &forecast, nil
 }

@@ -12,11 +12,11 @@ import (
 )
 
 type ForecastInterface interface {
-	Create(context.Context, dto.WeatherForecast, domain.Town) error
+	Create(ctx context.Context, forecast dto.WeatherForecast, city domain.Town) error
 }
 
 type CityInterface interface {
-	GetAll(context.Context) ([]domain.Town, error)
+	GetAll(ctx context.Context) ([]domain.Town, error)
 }
 
 func GetForecasts(forecastRepo ForecastInterface, cityRepo CityInterface, apiToken string) error {

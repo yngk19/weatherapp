@@ -14,6 +14,7 @@ type Config struct {
 	ServerConfig
 	DBConfig
 	OpenWeatherAPIKey string
+	LogFilePath       string
 }
 
 type ServerConfig struct {
@@ -44,6 +45,7 @@ func MustLoad() *Config {
 		log.Fatalf("Cannot load the .env file!: %s", err)
 	}
 	configPath := os.Getenv("CONFIG_PATH")
+	logFilePath := os.Getenv("LOG_FILE_PATH")
 	OpenWeatherAPIKey := os.Getenv("OPENWEATHER_KEY")
 	dbHost := os.Getenv("POSTGRES_HOST")
 	dbPortString := os.Getenv("POSTGRES_PORT")
@@ -79,6 +81,7 @@ func MustLoad() *Config {
 		DBConfig:          db,
 		ServerConfig:      srv,
 		OpenWeatherAPIKey: OpenWeatherAPIKey,
+		LogFilePath:       logFilePath,
 	}
 	return &cfg
 }
