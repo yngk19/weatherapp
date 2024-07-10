@@ -21,14 +21,14 @@ func New(db *pgxpool.Pool) *Repo {
 }
 
 func (r *Repo) Create(ctx context.Context, city dto.Town) error {
-	cityId := 0
+	var id int
 	query := `
-		INSERT INTO cities (name, country, lat, lon)
-		VALUES ($1, $2, $3, $4)
-		ON CONFLICT (name) DO NOTHING
+		INSERT INTO cities (name, country, state, lat, lon)
+		VALUES ($1, $2, $3, $4, $5)
+		ON CONFLICT (lat, lon) DO NOTHING
 		RETURNING id;
 	`
-	if err := r.pool.QueryRow(ctx, query, city.Name, city.Country, city.Lat, city.Lon).Scan(&cityId); err != nil {
+	if err := r.pool.QueryRow(ctx, query, city.Name, city.Country, city.State, city.Lat, city.Lon).Scan(&id); err != nil {
 		return fmt.Errorf("repository.Cities.Create: %w", err)
 	}
 	return nil
@@ -37,7 +37,7 @@ func (r *Repo) Create(ctx context.Context, city dto.Town) error {
 func (r *Repo) GetAll(ctx context.Context) ([]domain.Town, error) {
 	var towns []domain.Town
 	query := `
-		SELECT c.id, c.name, c.country, c.lat, c.lon  
+		SELECT c.id, c.name, c.country, c.state, c.lat, c.lon  
 		FROM cities c;
 	`
 	rows, err := r.pool.Query(ctx, query)
@@ -50,6 +50,7 @@ func (r *Repo) GetAll(ctx context.Context) ([]domain.Town, error) {
 			&town.ID,
 			&town.Name,
 			&town.Country,
+			&town.State,
 			&town.Lat,
 			&town.Lon,
 		)

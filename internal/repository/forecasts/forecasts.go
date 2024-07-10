@@ -3,6 +3,7 @@ package forecastsrepo
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	_ "github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -21,48 +22,52 @@ func New(db *pgxpool.Pool) *Repo {
 }
 
 func (r *Repo) Create(ctx context.Context, forecast dto.WeatherForecast, city domain.Town) error {
-	var cityName string
 	query := `
-		INSERT INTO forecasts (temp, city_name, prediction_date, data)
+		INSERT INTO forecasts (temp, city_id, predict_date, detail_info)
 		VALUES ($1, $2, $3, $4)
-		ON CONFLICT (city_name) DO UPDATE
-		SET prediction_date = EXCLUDED.prediction_date,
-		temp = EXCLUDED.temp,
-		data = EXCLUDED.data
-		RETURNING city_name;
+		ON CONFLICT (predict_date, city_id) DO UPDATE
+		SET temp = EXCLUDED.temp,
+		detail_info = EXCLUDED.detail_info;
 	`
-	if err := r.pool.QueryRow(ctx, query, forecast.List[0].Main.Temp, city.Name, forecast.List[0].DtTxt, forecast.List).Scan(&cityName); err != nil {
-		return fmt.Errorf("repository.Cities.Create: %w", err)
+	forecasts := make(map[string][]dto.List)
+	for _, weather := range forecast.List {
+		date := strings.Split(weather.DtTxt, " ")[0]
+		forecasts[date] = append(forecasts[date], weather)
 	}
-	fmt.Println(cityName)
+	for date, weatherSet := range forecasts {
+		fmt.Println(date)
+		if err := r.pool.QueryRow(ctx, query, weatherSet[0].Main.Temp, city.ID, date, weatherSet).Scan(); err != nil {
+			return fmt.Errorf("repository.Forecasts.Create: %w", err)
+		}
+	}
 	return nil
+
 }
 
-/*
-func (r *Repo) GetAll(ctx context.Context) ([]domain.Town, error) {
-	var towns []domain.Town
+func (r *Repo) GetByCityID(ctx context.Context) ([]domain.WeatherForecast, error) {
+	var forecasts []domain.WeatherForecast
 	query := `
-		SELECT c.id, c.name, c.country, c.lat, c.lon
-		FROM cities c;
+		SELECT f.id, f.temp, f.predict_date, f.detail_info 
+		FROM forecasts f 
+		ORDER BY predict_date DESC
+		LIMIT 5;
 	`
 	rows, err := r.pool.Query(ctx, query)
 	if err != nil {
-		return nil, fmt.Errorf("repository.Cities.GetAll: %w", err)
+		return nil, fmt.Errorf("repository.Forecasts.GetAll: %w", err)
 	}
 	for rows.Next() {
-		town := domain.Town{}
+		forecast := domain.WeatherForecast{}
 		err := rows.Scan(
-			&town.ID,
-			&town.Name,
-			&town.Country,
-			&town.Lat,
-			&town.Lon,
+			&forecast.ID,
+			&forecast.Temperature,
+			&forecast.Date,
+			&forecast.DetailInfo,
 		)
 		if err != nil {
-			return nil, fmt.Errorf("repository.Cities.GetAll: %w", err)
+			return nil, fmt.Errorf("repository.Forecasts.GetAll: %w", err)
 		}
-		towns = append(towns, town)
+		forecasts = append(forecasts, forecast)
 	}
-	return towns, nil
+	return forecasts, nil
 }
-*/
