@@ -32,7 +32,7 @@ func New(logger logger, citcitiesService citiesService) (*gin.Engine, error) {
 	api.GET("/cities", citiesAPI.GetCities)
 	api.GET("/cities/:cityID/short", citiesAPI.GetShortForecast)
 	api.GET("cities/:cityID/:date", citiesAPI.GetForecastByDate)
-
+	api.GET("/cities/:cityID", citiesAPI.GetFullForecast)
 	return r, nil
 }
 

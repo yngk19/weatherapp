@@ -78,7 +78,31 @@ func (api *API) GetForecastByDate(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"stats": "success",
-		date:    forecast,
+		"status": "success",
+		date:     forecast,
+	})
+}
+
+func (api *API) GetFullForecast(c *gin.Context) {
+	cityID, err := strconv.Atoi(c.Param("cityID"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "error",
+			"msg":    err,
+		})
+		return
+	}
+	forecast, err := api.service.GetForecastByCityID(c, cityID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "error",
+			"msg":    err,
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"status":   "success",
+		"city_id":  cityID,
+		"forecast": forecast,
 	})
 }
