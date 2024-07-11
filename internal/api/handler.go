@@ -14,6 +14,7 @@ type citiesService interface {
 	GetForecastByCityID(ctx context.Context, id int) ([]domain.WeatherForecast, error)
 	GetForecastByDate(ctx context.Context, date string, id int) (*domain.WeatherForecast, error)
 	GetShortByCityID(ctx context.Context, id int) (*dto.ShortForecast, error)
+	GetCityByID(ctx context.Context, id int) (*domain.Town, error)
 }
 
 type logger interface {
@@ -31,8 +32,7 @@ func New(logger logger, citcitiesService citiesService) (*gin.Engine, error) {
 	api := r.Group("/")
 	api.GET("/cities", citiesAPI.GetCities)
 	api.GET("/cities/:cityID/short", citiesAPI.GetShortForecast)
-	api.GET("cities/:cityID/:date", citiesAPI.GetForecastByDate)
-	api.GET("/cities/:cityID", citiesAPI.GetFullForecast)
+	api.GET("/cities/:cityID", citiesAPI.GetForecast)
 	return r, nil
 }
 

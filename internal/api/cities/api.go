@@ -12,6 +12,7 @@ type citiesService interface {
 	GetForecastByCityID(ctx context.Context, id int) ([]domain.WeatherForecast, error)
 	GetForecastByDate(ctx context.Context, date string, id int) (*domain.WeatherForecast, error)
 	GetShortByCityID(ctx context.Context, id int) (*dto.ShortForecast, error)
+	GetCityByID(ctx context.Context, id int) (*domain.Town, error)
 }
 
 type logger interface {

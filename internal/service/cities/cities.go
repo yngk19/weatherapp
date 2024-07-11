@@ -12,7 +12,7 @@ import (
 type citiesRepo interface {
 	Create(ctx context.Context, city dto.Town) error
 	GetAll(ctx context.Context) ([]domain.Town, error)
-	GetByCityID(ctx context.Context, id int) (*domain.Town, error)
+	GetCityByID(ctx context.Context, id int) (*domain.Town, error)
 }
 
 type forecastsRepo interface {
@@ -74,7 +74,7 @@ func (s *Service) GetShortByCityID(ctx context.Context, id int) (*dto.ShortForec
 	if forecasts == nil {
 		return nil, service.ErrNoForecasts
 	}
-	city, err := s.citiesRepo.GetByCityID(ctx, id)
+	city, err := s.citiesRepo.GetCityByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -98,4 +98,15 @@ func (s *Service) GetShortByCityID(ctx context.Context, id int) (*dto.ShortForec
 		Dates:              dates,
 	}
 	return &shortForecast, nil
+}
+
+func (s *Service) GetCityByID(ctx context.Context, id int) (*domain.Town, error) {
+	city, err := s.citiesRepo.GetCityByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if city == nil {
+		return nil, service.ErrNoSuchCity
+	}
+	return city, nil
 }

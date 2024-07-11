@@ -67,7 +67,7 @@ func (r *Repo) GetAll(ctx context.Context) ([]domain.Town, error) {
 	return towns, nil
 }
 
-func (r *Repo) GetByCityID(ctx context.Context, id int) (*domain.Town, error) {
+func (r *Repo) GetCityByID(ctx context.Context, id int) (*domain.Town, error) {
 	query := `
 		SELECT c.id, c.name, c.state, c.country, c.lat, c.lon
 		FROM cities c 
@@ -78,7 +78,7 @@ func (r *Repo) GetByCityID(ctx context.Context, id int) (*domain.Town, error) {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil
 		}
-		return nil, fmt.Errorf("repository.Cities.GetByCityID: %w", err)
+		return nil, fmt.Errorf("repository.Cities.GetCityByID: %w", err)
 	}
 	return &city, nil
 }

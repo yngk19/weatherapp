@@ -3,10 +3,12 @@ package weatherclient
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"sync"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/yngk19/weatherapp/internal/model/domain"
 	"github.com/yngk19/weatherapp/internal/model/dto"
 )
@@ -44,8 +46,10 @@ func GetForecasts(forecastRepo ForecastInterface, cityRepo CityInterface, apiTok
 			}
 			err = forecastRepo.Create(context.Background(), forecast, city)
 			if err != nil {
-				fmt.Printf("weatherapigo.GetForecasts: %s\n", err)
-				return
+				if errors.Is(err, pgx.ErrNoRows) {
+					return
+				}
+				fmt.Printf("weatherapi.GetForecasts: %s", err.Error())
 			}
 		}(url, city)
 	}

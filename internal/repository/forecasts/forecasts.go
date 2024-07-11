@@ -35,7 +35,6 @@ func (r *Repo) Create(ctx context.Context, forecast dto.WeatherForecast, city do
 		forecasts[date] = append(forecasts[date], weather)
 	}
 	for date, weatherSet := range forecasts {
-		fmt.Println(date)
 		if err := r.pool.QueryRow(ctx, query, weatherSet[0].Main.Temp, city.ID, date, weatherSet).Scan(); err != nil {
 			return fmt.Errorf("repository.Forecasts.Create: %w", err)
 		}

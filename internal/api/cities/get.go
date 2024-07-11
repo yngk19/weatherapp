@@ -1,8 +1,10 @@
 package cities
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -53,13 +55,29 @@ func (api *API) GetShortForecast(c *gin.Context) {
 		})
 		return
 	}
+	city, err := api.service.GetCityByID(c, cityID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "error",
+			"msg":    err.Error(),
+		})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{
-		"stats":          "success",
+		"status":         "success",
+		"city_id":        cityID,
+		"name":           city.Name,
+		"country":        city.Country,
+		"state":          city.State,
+		"lat":            city.Lat,
+		"lon":            city.Lon,
 		"short_forecast": forecast,
 	})
 }
 
-func (api *API) GetForecastByDate(c *gin.Context) {
+func (api *API) GetForecast(c *gin.Context) {
+	dateParam := c.Query("date")
+	timeParam := c.Query("time")
 	cityID, err := strconv.Atoi(c.Param("cityID"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -68,41 +86,75 @@ func (api *API) GetForecastByDate(c *gin.Context) {
 		})
 		return
 	}
-	date := c.Param("date")
-	forecast, err := api.service.GetForecastByDate(c, date, cityID)
+	city, err := api.service.GetCityByID(c, cityID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status": "error",
-			"msg":    err,
+			"msg":    err.Error(),
 		})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"status": "success",
-		date:     forecast,
-	})
-}
+	if dateParam != "" {
+		forecast, err := api.service.GetForecastByDate(c, dateParam, cityID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status": "error",
+				"msg":    err,
+			})
+			return
+		}
+		if timeParam != "" {
+			for _, forecastAtTime := range forecast.DetailInfo {
+				forecastTime := strings.Split(forecastAtTime.DtTxt, " ")[1]
+				if forecastTime == timeParam {
+					c.JSON(http.StatusOK, gin.H{
+						"status":  "success",
+						"city_id": cityID,
+						"name":    city.Name,
+						"country": city.Country,
+						"state":   city.State,
+						"lat":     city.Lat,
+						"lon":     city.Lon,
+						fmt.Sprintf("%s %s", dateParam, timeParam): forecastAtTime,
+					})
+					return
+				}
+			}
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status": "error",
+				"msg":    "there is no forecast at this time",
+			})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"status":  "success",
+			"city_id": cityID,
+			"name":    city.Name,
+			"country": city.Country,
+			"state":   city.State,
+			"lat":     city.Lat,
+			"lon":     city.Lon,
+			dateParam: forecast,
+		})
+	} else {
+		forecast5days, err := api.service.GetForecastByCityID(c, cityID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status": "error",
+				"msg":    err.Error(),
+			})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"status":    "success",
+			"city_id":   cityID,
+			"name":      city.Name,
+			"country":   city.Country,
+			"state":     city.State,
+			"lat":       city.Lat,
+			"lon":       city.Lon,
+			"forecasts": forecast5days,
+		})
+	}
 
-func (api *API) GetFullForecast(c *gin.Context) {
-	cityID, err := strconv.Atoi(c.Param("cityID"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "error",
-			"msg":    err,
-		})
-		return
-	}
-	forecast, err := api.service.GetForecastByCityID(c, cityID)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "error",
-			"msg":    err,
-		})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{
-		"status":   "success",
-		"city_id":  cityID,
-		"forecast": forecast,
-	})
 }

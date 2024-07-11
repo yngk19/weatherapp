@@ -3,10 +3,12 @@ package geoapiclient
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"sync"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/yngk19/weatherapp/internal/model/dto"
 )
 
@@ -57,9 +59,12 @@ func GetCities(repo CitiesRepo, apiToken string) error {
 				fmt.Printf("%s: %s\n", url, err)
 				return
 			}
-			err = repo.Create(context.TODO(), towns[0])
+			err = repo.Create(context.Background(), towns[0])
 			if err != nil {
-				fmt.Printf("Create %s: %s\n", towns[0].Name, err)
+				if errors.Is(err, pgx.ErrNoRows) {
+					return
+				}
+				fmt.Printf("geoapiclient.GetCities: %s - %s", towns[0].Name, err.Error())
 				return
 			}
 		}(url)
