@@ -10,7 +10,7 @@ type ShortForecast struct {
 }
 
 type WeatherForecast struct {
-	Cod     string `json:"cod"`
+	Cod     int    `json:"cod"`
 	Message int    `json:"message"`
 	Cnt     int    `json:"cnt"`
 	List    []List `json:"list"`
