@@ -17,10 +17,10 @@ golang-migrate (для миграций)
 1. Склонировать репо
 2. Создать файл .env в директории проекта и заполнить, также предварительно получить api_key на сайте openweathermap.org и указать в .env. В файле config/local.yaml можно конфигурировать http сервер
 3. Выполнить в терминале:
-   ```
-   ~$ go mod download 
-   ~$ make build
-   ~$ make run 
+   ```bash
+   go mod download 
+   make build
+   make run 
    ``` 
 
 ## Спецификация API
@@ -79,17 +79,17 @@ golang-migrate (для миграций)
     "lon": 131.9520752,
     "name": "Ussurijsk",
     "state": "Primorsky Krai",
-    "2024-07-12": {
-        "ID": 34,
-        "Temperature": 292.33,
-        "Date": "2024-07-12T00:00:00Z",
-        "DetailInfo": [
-            {
-                "dt": 1720742400,
-                "main": {
-                    "temp": 292.33,
-       .......
+    "date": "2024-07-12",
+    "weather": {
+        "dt": 1720785600,
+        "main": {
+            "temp": 290.57,
+            "feels_like": 290.74,
+            "temp_min": 290.57,
+            "temp_max": 290.57, 
+ ......
 }
+
 ```
 
 ### GET /cities/:id?date=2024-07-11&time=03:00:00
@@ -105,16 +105,17 @@ golang-migrate (для миграций)
     "lon": 131.9520752,
     "name": "Ussurijsk",
     "state": "Primorsky Krai",
-    {
-    "2024-07-12 12:00:00": {
+    "time": "2024-07-12 12:00:00",
+    "weather": {
         "dt": 1720785600,
         "main": {
             "temp": 290.57,
             "feels_like": 290.74,
             "temp_min": 290.57,
-            "temp_max": 290.57,	
-	......
+            "temp_max": 290.57, 
+ ......
 }
+
 ```
 
 ### GET /cities/:id/short

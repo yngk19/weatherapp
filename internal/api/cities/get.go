@@ -109,14 +109,15 @@ func (api *API) GetForecast(c *gin.Context) {
 				forecastTime := strings.Split(forecastAtTime.DtTxt, " ")[1]
 				if forecastTime == timeParam {
 					c.JSON(http.StatusOK, gin.H{
-						"status":  "success",
-						"city_id": cityID,
-						"name":    city.Name,
-						"country": city.Country,
-						"state":   city.State,
-						"lat":     city.Lat,
-						"lon":     city.Lon,
-						fmt.Sprintf("%s %s", dateParam, timeParam): forecastAtTime,
+						"status":   "success",
+						"city_id":  cityID,
+						"name":     city.Name,
+						"country":  city.Country,
+						"state":    city.State,
+						"lat":      city.Lat,
+						"lon":      city.Lon,
+						"time":     fmt.Sprintf("%s %s", dateParam, timeParam),
+						"forecast": forecastAtTime,
 					})
 					return
 				}
@@ -128,14 +129,15 @@ func (api *API) GetForecast(c *gin.Context) {
 			return
 		}
 		c.JSON(http.StatusOK, gin.H{
-			"status":  "success",
-			"city_id": cityID,
-			"name":    city.Name,
-			"country": city.Country,
-			"state":   city.State,
-			"lat":     city.Lat,
-			"lon":     city.Lon,
-			dateParam: forecast,
+			"status":   "success",
+			"city_id":  cityID,
+			"name":     city.Name,
+			"country":  city.Country,
+			"state":    city.State,
+			"lat":      city.Lat,
+			"lon":      city.Lon,
+			"date":     dateParam,
+			"forecast": forecast,
 		})
 	} else {
 		forecast5days, err := api.service.GetForecastByCityID(c, cityID)
