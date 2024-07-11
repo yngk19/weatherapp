@@ -45,13 +45,11 @@ func GetForecasts(forecastRepo ForecastInterface, cityRepo CityInterface, apiTok
 				return
 			}
 			err = forecastRepo.Create(context.Background(), forecast, city)
-			if err != nil {
-				if errors.Is(err, pgx.ErrNoRows) {
-					return
-				}
-				fmt.Printf("weatherapi.GetForecasts: %s", err.Error())
+			if !errors.Is(err, pgx.ErrNoRows) {
+				fmt.Printf("weatherapigo.GetForecasts: %s\n", err)
+				return
 			}
-			fmt.Printf("City: %s - Date: %s - Temp: %f", forecast.City.Name, forecast.List[0].DtTxt, forecast.List[0].Temp)
+			fmt.Printf("City: %s - Date: %s - Temp: %f\n", forecast.City.Name, forecast.List[0].DtTxt, forecast.List[0].Temp)
 		}(url, city)
 	}
 
