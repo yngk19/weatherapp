@@ -51,6 +51,7 @@ func GetForecasts(forecastRepo ForecastInterface, cityRepo CityInterface, apiTok
 				}
 				fmt.Printf("weatherapi.GetForecasts: %s", err.Error())
 			}
+			fmt.Printf("City: %s - Date: %s - Temp: %f", forecast.City.Name, forecast.List[0].DtTxt, forecast.List[0].Temp)
 		}(url, city)
 	}
 
