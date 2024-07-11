@@ -19,7 +19,8 @@ func (api *API) GetCities(c *gin.Context) {
 	citiesDomain, err := api.service.GetCities(c)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
-			"error": err,
+			"status": "error",
+			"error":  "there are no cities",
 		})
 		api.logger.Err(err)
 		return
@@ -43,7 +44,7 @@ func (api *API) GetShortForecast(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status": "error",
-			"msg":    err,
+			"msg":    "city id is invalid",
 		})
 		return
 	}
@@ -51,7 +52,7 @@ func (api *API) GetShortForecast(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status": "error",
-			"msg":    err,
+			"msg":    "there is no forecast for this city",
 		})
 		return
 	}
@@ -59,7 +60,7 @@ func (api *API) GetShortForecast(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status": "error",
-			"msg":    err.Error(),
+			"msg":    "city with such id doesn't exist",
 		})
 		return
 	}
@@ -82,7 +83,7 @@ func (api *API) GetForecast(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status": "error",
-			"msg":    err,
+			"msg":    "city id is invalid",
 		})
 		return
 	}
@@ -90,7 +91,7 @@ func (api *API) GetForecast(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status": "error",
-			"msg":    err.Error(),
+			"msg":    "city with such id doesn't exits",
 		})
 		return
 	}
@@ -99,7 +100,7 @@ func (api *API) GetForecast(c *gin.Context) {
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"status": "error",
-				"msg":    err,
+				"msg":    "forecast for this date doesn't exist",
 			})
 			return
 		}
@@ -141,7 +142,7 @@ func (api *API) GetForecast(c *gin.Context) {
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"status": "error",
-				"msg":    err.Error(),
+				"msg":    "forecasts for this city doesn't exits",
 			})
 			return
 		}

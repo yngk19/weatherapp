@@ -11,13 +11,13 @@ import (
 
 	"github.com/yngk19/weatherapp/internal/api"
 	"github.com/yngk19/weatherapp/internal/config"
-	"github.com/yngk19/weatherapp/internal/pkg/db"
-	"github.com/yngk19/weatherapp/internal/pkg/geoapiclient"
-	"github.com/yngk19/weatherapp/internal/pkg/logger"
-	"github.com/yngk19/weatherapp/internal/pkg/weatherclient"
 	citiesrepo "github.com/yngk19/weatherapp/internal/repository/cities"
 	forecastsrepo "github.com/yngk19/weatherapp/internal/repository/forecasts"
 	"github.com/yngk19/weatherapp/internal/service/cities"
+	"github.com/yngk19/weatherapp/pkg/db"
+	"github.com/yngk19/weatherapp/pkg/geoapiclient"
+	"github.com/yngk19/weatherapp/pkg/logger"
+	"github.com/yngk19/weatherapp/pkg/weatherclient"
 )
 
 func main() {
